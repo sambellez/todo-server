@@ -29,14 +29,32 @@ exports.findAll = function(_, res) {
 * GET todo by identifier.
 */
 exports.findById = function(req, res) {
-  res.json(404, 'Not found');
+  const { id } = req.params;
+  const todo = todos?.find(todo => todo.id === +id);
+
+  if (!todo) {
+    return res.json(404, {error : `Todo with id ${id} cannot be found`});
+  }
+
+  return res.json(200, todo);
 };
 
 /*
 * Create a todo.
 */
 exports.addTodo = function(req, res) {
-  res.status(201).end();
+  const { description, memo, priority } = req.body;
+  const body = { description, memo, priority };
+  const missingAttributes = Object.keys(body).filter(key => !body[key]);
+
+  if (missingAttributes.length) {
+    return res.json(400, {error : `The following attributes are mandatory ${missingAttributes.join(',')}`});
+  }
+
+  const todo = {id: id++, updatedAt: Date.now(), ...body};
+  todos.push(todo);
+
+  return res.json(201, todo);
 };
 
 /*
